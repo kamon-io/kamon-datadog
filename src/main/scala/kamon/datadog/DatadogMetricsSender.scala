@@ -25,12 +25,14 @@ import java.text.{DecimalFormatSymbols, DecimalFormat}
 import kamon.metric.instrument.{Counter, Histogram}
 import kamon.metric.{SingleInstrumentEntityRecorder, MetricKey, Entity}
 import java.util.Locale
+import collection.JavaConverters._
 
 class DatadogMetricsSender(remote: InetSocketAddress, maxPacketSizeInBytes: Long) extends Actor with UdpExtensionProvider {
 
   import context.system
 
   val appName = context.system.settings.config.getString("kamon.datadog.application-name")
+  val globalTags = context.system.settings.config.getStringList("kamon.datadog.global-tags").asScala
   val symbols = DecimalFormatSymbols.getInstance(Locale.US)
   symbols.setDecimalSeparator('.') // Just in case there is some weird locale config we are not aware of.
 
@@ -99,7 +101,7 @@ class DatadogMetricsSender(remote: InetSocketAddress, maxPacketSizeInBytes: Long
       s"$appName.${entity.category}.${metricKey.name}"
 
   def buildIdentificationTag(entity: Entity, metricKey: MetricKey): String = {
-    def tagsString: String = entity.tags.map { case (k, v) ⇒ k + ":" + v } mkString ","
+    def tagsString: String = globalTags ++ entity.tags.map { case (k, v) ⇒ k + ":" + v } mkString ","
 
     if (isSingleInstrumentEntity(entity)) {
       if (entity.tags.nonEmpty) "|#" + tagsString else ""
