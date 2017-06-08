@@ -152,7 +152,4 @@ class TestEntityRecorder(instrumentFactory: InstrumentFactory) extends GenericEn
   val counterOne = counter("counter")
 }
 
-object TestEntityRecorder extends EntityRecorderFactory[TestEntityRecorder] {
-  def category: String = "category"
-  def createRecorder(instrumentFactory: InstrumentFactory): TestEntityRecorder = new TestEntityRecorder(instrumentFactory)
-}
+object TestEntityRecorder extends EntityRecorderFactoryCompanion[TestEntityRecorder]("category", new TestEntityRecorder(_))
