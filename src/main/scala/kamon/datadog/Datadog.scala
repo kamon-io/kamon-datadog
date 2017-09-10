@@ -49,11 +49,11 @@ class DatadogExtension(system: ExtendedActorSystem) extends Kamon.Extension {
   val datadogMetricsListener = buildMetricsListener(tickInterval, flushInterval)
 
   val subscriptions = datadogConfig.getConfig("subscriptions")
-  subscriptions.firstLevelKeys.map { subscriptionCategory ⇒
-    subscriptions.getStringList(subscriptionCategory).asScala.foreach { pattern ⇒
-      Kamon.metrics.subscribe(subscriptionCategory, pattern, datadogMetricsListener, permanently = true)
-    }
-  }
+  for {
+    subscriptionCategory ← subscriptions.firstLevelKeys
+    pattern ← subscriptions.getStringList(subscriptionCategory).asScala
+  } Kamon.metrics.subscribe(subscriptionCategory, pattern, datadogMetricsListener, permanently = true)
+
 
   def buildMetricsListener(tickInterval: FiniteDuration, flushInterval: FiniteDuration): ActorRef = {
     assert(flushInterval >= tickInterval, "Datadog flush-interval needs to be equal or greater to the tick-interval")
