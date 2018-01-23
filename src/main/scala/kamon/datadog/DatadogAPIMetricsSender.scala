@@ -61,7 +61,7 @@ class DatadogAPIMetricsSender extends Actor with ActorLogging {
   override def receive = ready
 
   def send(tick: TickMetricSnapshot): Unit = {
-    val time:Long = tick.from.millis
+    val time:Long = tick.from.millis / 1000
 
     val series:String = (for {
       (groupIdentity, groupSnapshot) ← tick.metrics
@@ -70,7 +70,7 @@ class DatadogAPIMetricsSender extends Actor with ActorLogging {
       val key = buildMetricName(groupIdentity, metricIdentity)
       val tags = groupIdentity.tags.map { case (k,v) => "\"" + k + ":" + v + "\"" }.mkString(",")
       def emit(keyPostfix: String, metricType: String, value: Double): String =
-        s"""["metric":"${key}${keyPostfix}","points":[[${time},${value}]],"type":"${metricType}","host":"${host}","tags":[${tags}]]"""
+        s"""{"metric":"${key}${keyPostfix}","points":[[${time},${value}]],"type":"${metricType}","host":"${host}","tags":[${tags}]}"""
 
       metricSnapshot match {
         case hs: Histogram.Snapshot ⇒
@@ -85,7 +85,7 @@ class DatadogAPIMetricsSender extends Actor with ActorLogging {
           if (cs.count > 0) Seq(emit("", "counter", cs.count)) else Seq()
       }
     }).flatten.mkString(",")
-    val body = series
+    val body = s"""{"series":[$series]}"""
 
     client.preparePost(url).setBody(body).setHeader("Content-Type", "application/json").execute().toCompletableFuture.toScala pipeTo self
   }
