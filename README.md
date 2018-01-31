@@ -18,14 +18,16 @@ Supported releases and dependencies are shown below.
 
 | kamon-datadog  | status | jdk  | scala            | akka   |
 |:------:|:------:|:----:|------------------|:------:|
-|  0.6.7 | stable | 1.7+, 1.8+ | 2.10, 2.11, 2.12  | 2.3.x, 2.4.x |
+|  0.6.8 | stable | 1.7+, 1.8+ | 2.10, 2.11, 2.12  | 2.3.x, 2.4.x |
 
 To get started with SBT, simply add the following to your `build.sbt`
 file:
 
 ```scala
-libraryDependencies += "io.kamon" %% "kamon-datadog" % "0.6.7"
+libraryDependencies += "io.kamon" %% "kamon-datadog" % "0.6.8"
 ```
+
+The kamon-datadog version 0.6.8 is compatible with kamon-core 0.6.7. (See issue [#4](https://github.com/kamon-io/kamon-datadog/issues/4))
 
 Configuration
 -------------
