@@ -44,3 +44,14 @@ def formatSettings(prefs: IFormattingPreferences) = prefs
   .setPreference(DoubleIndentMethodDeclaration, false)
   .setPreference(DanglingCloseParenthesis, Preserve)
   .setPreference(NewlineAtEndOfFile, true)
+
+publishTo := {
+  val nexus = "https://maven-upload.tradeshift.net/"
+  if (isSnapshot.value)
+    Some("tradeshift-upload-snapshots" at nexus + "content/repositories/tradeshift-snapshots") 
+  else
+    Some("tradeshift-upload-releases" at nexus + "content/repositories/tradeshift-releases") 
+}
+
+credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
+credentials += Credentials(Path.userHome / ".ivy2" / ".upload-credentials")
