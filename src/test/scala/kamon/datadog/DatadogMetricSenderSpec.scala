@@ -61,7 +61,7 @@ class DatadogMetricSenderSpec extends WordSpec with Matchers with Reconfigure {
         )
 
         buffer.lst should have size (1)
-        buffer.lst should contain("test.counter" -> "0|c#|service:kamon-application,env:staging,tag1:value1")
+        buffer.lst should contain("test.counter" -> "0|c|#service:kamon-application,env:staging,tag1:value1")
     }
 
     "filter out blacklisted tags" in AgentReporter(new TestBuffer(), ConfigFactory.parseString(
@@ -87,7 +87,7 @@ class DatadogMetricSenderSpec extends WordSpec with Matchers with Reconfigure {
         )
 
         buffer.lst should have size (1)
-        buffer.lst should contain("test.counter" -> "0|c#|service:kamon-application,tag1:value1")
+        buffer.lst should contain("test.counter" -> "0|c|#service:kamon-application,tag1:value1")
     }
 
     "filter other tags" in AgentReporter(new TestBuffer(), ConfigFactory.parseString(
@@ -113,7 +113,7 @@ class DatadogMetricSenderSpec extends WordSpec with Matchers with Reconfigure {
         )
 
         buffer.lst should have size (1)
-        buffer.lst should contain("test.counter" -> "0|c#|service:kamon-application,otherTag:otherValue")
+        buffer.lst should contain("test.counter" -> "0|c|#service:kamon-application,otherTag:otherValue")
     }
 
   }
