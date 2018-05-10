@@ -55,14 +55,21 @@ class DatadogAgentReporter private[datadog] (c: DatadogAgentReporter.Configurati
     this.config = readConfiguration(config)
   }
 
+  private val metricKeyPrefix = if (Kamon.config().hasPath("kamon.application-name")) {
+    val applicationName = Kamon.config().getString("kamon.application-name")
+    if (applicationName.isEmpty) "" else applicationName + "."
+  } else {
+    ""
+  }
+
   override def reportPeriodSnapshot(snapshot: PeriodSnapshot): Unit = {
 
     for (counter <- snapshot.metrics.counters) {
-      config.packetBuffer.appendMeasurement(counter.name, config.measurementFormatter.formatMeasurement(encodeDatadogCounter(counter.value, counter.unit), counter.tags))
+      config.packetBuffer.appendMeasurement(metricKeyPrefix + counter.name, config.measurementFormatter.formatMeasurement(encodeDatadogCounter(counter.value, counter.unit), counter.tags))
     }
 
     for (gauge <- snapshot.metrics.gauges) {
-      config.packetBuffer.appendMeasurement(gauge.name, config.measurementFormatter.formatMeasurement(encodeDatadogGauge(gauge.value, gauge.unit), gauge.tags))
+      config.packetBuffer.appendMeasurement(metricKeyPrefix + gauge.name, config.measurementFormatter.formatMeasurement(encodeDatadogGauge(gauge.value, gauge.unit), gauge.tags))
     }
 
     for (
@@ -71,7 +78,7 @@ class DatadogAgentReporter private[datadog] (c: DatadogAgentReporter.Configurati
     ) {
 
       val bucketData = config.measurementFormatter.formatMeasurement(encodeDatadogHistogramBucket(bucket.value, bucket.frequency, metric.unit), metric.tags)
-      config.packetBuffer.appendMeasurement(metric.name, bucketData)
+      config.packetBuffer.appendMeasurement(metricKeyPrefix + metric.name, bucketData)
     }
 
     config.packetBuffer.flush()
