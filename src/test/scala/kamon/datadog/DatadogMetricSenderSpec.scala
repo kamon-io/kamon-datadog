@@ -116,6 +116,25 @@ class DatadogMetricSenderSpec extends WordSpec with Matchers with Reconfigure {
         buffer.lst should contain("test.counter" -> "0|c|#service:kamon-application,otherTag:otherValue")
     }
 
+    "use application-name prefix" in AgentReporter(new TestBuffer(), ConfigFactory.parseString(
+      """
+        |kamon.application-name = "an-application"
+        |kamon.environment.service = "super-cool-application"
+        |""".stripMargin).withFallback(Kamon.config())) {
+      case (buffer, reporter) =>
+        val now = Instant.now()
+        reporter.reportPeriodSnapshot(
+          PeriodSnapshot.apply(
+            now.minusMillis(1000), now, MetricsSnapshot.apply(
+              Nil, Nil, Nil, Seq(MetricValue.apply("test.counter", Map(), MeasurementUnit.none, 0))
+            )
+          )
+        )
+
+        buffer.lst should have size 1
+        buffer.lst("an-application.test.counter") shouldBe "0|c|#service:super-cool-application"
+    }
+
   }
 
   def AgentReporter[A, B <: PacketBuffer](buffer: B, config: Config)(f: (B, DatadogAgentReporter) => A): A = {
