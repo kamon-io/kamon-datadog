@@ -16,16 +16,18 @@
 import scalariform.formatter.preferences._
 import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 
-val kamonCore         = "io.kamon"               %% "kamon-core"          % "1.1.2"
-val kamonTestKit      = "io.kamon"               %% "kamon-testkit"       % "1.1.2"
-val asyncHttpClient   = "com.squareup.okhttp3"    % "okhttp"              % "3.10.0"
+val kamonCore             = "io.kamon"               %% "kamon-core"          % "1.1.2"
+val kamonTestKit          = "io.kamon"               %% "kamon-testkit"       % "1.1.2"
+val asyncHttpClient       = "com.squareup.okhttp3"    % "okhttp"              % "3.10.0"
+val asyncHttpClientMock   = "com.squareup.okhttp3"    % "mockwebserver"       % "3.10.0"
+val playJson              = "com.typesafe.play"      %% "play-json"           % "2.7.1"
 
 lazy val root = (project in file("."))
   .settings(name := "kamon-datadog")
   .settings(
     libraryDependencies ++=
-      compileScope(kamonCore, asyncHttpClient, scalaCompact.value) ++
-        testScope(scalatest, slf4jApi, slf4jnop, kamonCore, kamonTestKit),
+      compileScope(kamonCore, asyncHttpClient, scalaCompact.value, playJson) ++
+        testScope(scalatest, slf4jApi, slf4jnop, kamonCore, kamonTestKit, asyncHttpClientMock),
     ScalariformKeys.preferences := formatSettings(ScalariformKeys.preferences.value))
 
 
