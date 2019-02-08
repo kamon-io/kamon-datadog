@@ -7,6 +7,7 @@ import kamon.Kamon
 import kamon.metric.{MeasurementUnit, MetricValue, MetricsSnapshot, PeriodSnapshot}
 import okhttp3.mockwebserver.{MockResponse, MockWebServer}
 import org.scalatest.{Matchers, WordSpec}
+import play.api.libs.json.Json
 
 class DatadogAPIReporterSpec extends AbstractHttpReporter with Matchers {
 
@@ -36,8 +37,8 @@ class DatadogAPIReporterSpec extends AbstractHttpReporter with Matchers {
         )
       )
       val request = server.takeRequest()
-      request.getBody().readUtf8() shouldBe """{"series":[{"metric":"test.counter","interval":1,"points":[[1523394,0]],"type":"count","host":"test","tags":["service:kamon-application","env:staging","tag1:value1"]}]}"""
       request.getRequestUrl.toString shouldEqual baseUrl + "?api_key="
+      Json.parse(request.getBody().readUtf8()) shouldEqual Json.parse("""{"series":[{"metric":"test.counter","interval":1,"points":[[1523394,0]],"type":"count","host":"test","tags":["service:kamon-application","env:staging","tag1:value1"]}]}""")
 
     }
 
