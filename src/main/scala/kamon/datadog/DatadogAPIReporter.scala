@@ -17,19 +17,19 @@
 package kamon.datadog
 
 import java.lang.StringBuilder
-import java.text.{DecimalFormat, DecimalFormatSymbols}
+import java.text.{ DecimalFormat, DecimalFormatSymbols }
 import java.time.Duration
 import java.util.Locale
 
 import com.typesafe.config.Config
 import kamon.metric._
 import kamon.metric.MeasurementUnit
-import kamon.metric.MeasurementUnit.Dimension.{Information, Time}
-import kamon.util.{EnvironmentTagBuilder, Matcher}
-import kamon.{Kamon, MetricReporter}
+import kamon.metric.MeasurementUnit.Dimension.{ Information, Time }
+import kamon.util.{ EnvironmentTagBuilder, Matcher }
+import kamon.{ Kamon, MetricReporter }
 import org.slf4j.LoggerFactory
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{ Failure, Success, Try }
 
 class DatadogAPIReporter extends MetricReporter {
   import DatadogAPIReporter._
@@ -117,7 +117,6 @@ class DatadogAPIReporter extends MetricReporter {
 
     case _ => value.toDouble
   }
-
 
   private def readConfiguration(config: Config): Configuration = {
     val datadogConfig = config.getConfig("kamon.datadog")

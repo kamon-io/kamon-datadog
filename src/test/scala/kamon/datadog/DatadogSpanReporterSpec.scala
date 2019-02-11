@@ -1,22 +1,21 @@
 package kamon.datadog
 
-import java.time.{Duration, Instant}
+import java.time.{ Duration, Instant }
 import java.util.concurrent.TimeUnit
 
 import kamon.Kamon
-import kamon.testkit.{Reconfigure, SpanBuilding}
+import kamon.testkit.{ Reconfigure, SpanBuilding }
 import kamon.trace._
 import okhttp3.mockwebserver.MockResponse
 import org.scalatest.Matchers
-import play.api.libs.json._
+import play.api.libs.json.{ JsObject, _ }
 
 import scala.collection.immutable.ListMap
 import scala.util.Random
 
-
 /**
-  * Fake data for testing propose
-  */
+ * Fake data for testing propose
+ */
 trait TestData extends SpanBuilding {
 
   val contextSpan = createSpanContext()
@@ -40,9 +39,9 @@ trait TestData extends SpanBuilding {
     )
 
   val json = Json.obj(
-    "trace_id" -> traceId,
-    "span_id" -> BigInt(contextSpan.spanID.string, 16),
-    "parent_id" -> BigInt(contextSpan.parentID.string, 16),
+    "trace_id" -> BigDecimal(traceId),
+    "span_id" -> BigDecimal(BigInt(contextSpan.spanID.string, 16)),
+    "parent_id" -> BigDecimal(BigInt(contextSpan.parentID.string, 16)),
     "service" -> "kamon-application",
     "resource" -> "operation name",
     "duration" -> JsNumber(duration.getSeconds * 1000000000 + duration.getNano),
@@ -50,13 +49,11 @@ trait TestData extends SpanBuilding {
     "meta" -> Json.obj(),
     "error" -> false,
     "type" -> "custom",
-    "start" -> JsNumber(from.getEpochNano),
+    "start" -> JsNumber(from.getEpochNano)
   )
-
 
   val spanWithoutParentId = span.copy(context = contextSpan.copy(parentID = IdentityProvider.NoIdentifier))
   val jsonWithoutParentId = json - "parent_id"
-
 
   val spanWithTags = span.copy(tags = Map(
     "string" -> Span.TagValue.String.apply("value"),
@@ -64,7 +61,6 @@ trait TestData extends SpanBuilding {
     "false" -> Span.TagValue.False,
     "number" -> Span.TagValue.Number(randomNumber)
   ))
-
 
   val jsonWithTags = json ++ Json.obj(
     "meta" -> Json.obj(
@@ -90,21 +86,18 @@ trait TestData extends SpanBuilding {
     tags = spanWithTags.tags
   )
 
-
   val jsonWithTagsAndMarks = json ++ Json.obj(
     "meta" -> (jsonWithTags.\("meta").as[JsObject] ++ jsonWithMarks.\("meta").as[JsObject])
   )
-
 
   val otherContextSpan = createSpanContext()
 
   val otherTraceSpan = span.copy(context = otherContextSpan)
   var otherTraceJson = json ++ (Json.obj(
-    "trace_id" -> BigInt(otherContextSpan.traceID.string, 16),
-    "span_id" -> BigInt(otherContextSpan.spanID.string, 16),
-    "parent_id" -> BigInt(otherContextSpan.parentID.string, 16)
+    "trace_id" -> JsNumber(BigDecimal(BigInt(otherContextSpan.traceID.string, 16))),
+    "span_id" -> JsNumber(BigDecimal(BigInt(otherContextSpan.spanID.string, 16))),
+    "parent_id" -> JsNumber(BigDecimal(BigInt(otherContextSpan.parentID.string, 16)))
   ))
-
 
   val testMap: ListMap[String, (Seq[Span.FinishedSpan], JsArray)] = ListMap(
     "single span" -> (Seq(span), Json.arr(Json.arr(json))),
@@ -118,9 +111,7 @@ trait TestData extends SpanBuilding {
   )
 }
 
-
 class DatadogSpanReporterSpec extends AbstractHttpReporter with Matchers with Reconfigure with TestData {
-
 
   "the DatadogSpanReporter" should {
     val reporter = new DatadogSpanReporter()
@@ -159,25 +150,23 @@ class DatadogSpanReporterSpec extends AbstractHttpReporter with Matchers with Re
       server.takeRequest()
     }
 
-
     //it needs to be the last one :-( (takeRequest hangs after a timeout test)
     s"ignore timed out responses" in {
-      val baseUrl = mockResponse("/test", new MockResponse().setStatus("HTTP/1.1 200 OK").setBody("OK").throttleBody(1,6,TimeUnit.SECONDS))
+      val baseUrl = mockResponse("/test", new MockResponse().setStatus("HTTP/1.1 200 OK").setBody("OK").throttleBody(1, 6, TimeUnit.SECONDS))
       applyConfig("kamon.datadog.trace.http.api-url = \"" + baseUrl + "\"")
       reporter.reconfigure(Kamon.config())
       reporter.reportSpans(testMap.get("single span").get._1)
 
     }
 
-
-
     reporter.stop()
 
   }
 
-
   def sortJsonSpans(s1: JsValue, s2: JsValue) = {
-    s1.\(0).get.as[JsObject].\("trace_id").get.toString() > s2.\(0).get.as[JsObject].\("trace_id").get.toString()
+    val traceId1 = s1.as[JsArray].value.head.as[JsObject].\("trace_id").get.toString()
+    val traceId2 = s2.as[JsArray].value.head.as[JsObject].\("trace_id").get.toString()
+    traceId1 > traceId2
   }
 }
 

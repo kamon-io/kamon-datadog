@@ -16,19 +16,27 @@
 import scalariform.formatter.preferences._
 import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 
+
 val kamonCore             = "io.kamon"               %% "kamon-core"          % "1.1.2"
 val kamonTestKit          = "io.kamon"               %% "kamon-testkit"       % "1.1.2"
 val asyncHttpClient       = "com.squareup.okhttp3"    % "okhttp"              % "3.10.0"
 val asyncHttpClientMock   = "com.squareup.okhttp3"    % "mockwebserver"       % "3.10.0"
-val playJson              = "com.typesafe.play"      %% "play-json"           % "2.7.1"
 
 lazy val root = (project in file("."))
   .settings(name := "kamon-datadog")
   .settings(
     libraryDependencies ++=
-      compileScope(kamonCore, asyncHttpClient, scalaCompact.value, playJson) ++
+      compileScope(kamonCore, asyncHttpClient, scalaCompact.value, playJsonVersion.value) ++
         testScope(scalatest, slf4jApi, slf4jnop, kamonCore, kamonTestKit, asyncHttpClientMock),
     ScalariformKeys.preferences := formatSettings(ScalariformKeys.preferences.value))
+
+
+def playJsonVersion = Def.setting {
+  scalaBinaryVersion.value match {
+    case "2.10"          => "com.typesafe.play"      %% "play-json"          % "2.4.11"
+    case "2.12" | "2.11" => "com.typesafe.play"      %% "play-json"          % "2.7.0"
+  }
+}
 
 
 def scalaCompact = Def.setting {

@@ -15,14 +15,14 @@ case class DdSpan(
   start:    Long,
   duration: Duration,
   meta:     Map[String, Any],
-  error:    Boolean){
+  error:    Boolean) {
 
-  implicit val anyValWriter = Writes[Any] (a => a match {
-    case v:String => JsString(v)
-    case v:Int => JsNumber(v)
-    case v:Long => JsNumber(v)
-    case v:Boolean => JsBoolean(v)
-    case v:Any => Json.toJson(v.toString)
+  implicit val anyValWriter = Writes[Any](a => a match {
+    case v: String  => JsString(v)
+    case v: Int     => JsNumber(v)
+    case v: Long    => JsNumber(v)
+    case v: Boolean => JsBoolean(v)
+    case v: Any     => Json.toJson(v.toString)
   })
 
   def toJson(): JsObject = {
@@ -36,10 +36,10 @@ case class DdSpan(
       "start" -> JsNumber(BigDecimal(start)),
       "duration" -> JsNumber(BigDecimal(duration.toNanos)),
       "meta" -> JsObject(meta.map(m => m._1 -> Json.toJson(m._2))),
-      "error" -> JsBoolean(error),
+      "error" -> JsBoolean(error)
     ))
-    if(parentId.nonEmpty){
-      json+("parent_id", JsNumber(BigDecimal(parentId.get)))
+    if (parentId.nonEmpty) {
+      json + ("parent_id", JsNumber(BigDecimal(parentId.get)))
     } else {
       json
     }

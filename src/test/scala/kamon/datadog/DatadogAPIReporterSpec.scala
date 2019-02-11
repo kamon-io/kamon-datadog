@@ -4,14 +4,12 @@ import java.time.Instant
 
 import com.typesafe.config.ConfigFactory
 import kamon.Kamon
-import kamon.metric.{MeasurementUnit, MetricValue, MetricsSnapshot, PeriodSnapshot}
-import okhttp3.mockwebserver.{MockResponse, MockWebServer}
-import org.scalatest.{Matchers, WordSpec}
+import kamon.metric.{ MeasurementUnit, MetricValue, MetricsSnapshot, PeriodSnapshot }
+import okhttp3.mockwebserver.{ MockResponse, MockWebServer }
+import org.scalatest.{ Matchers, WordSpec }
 import play.api.libs.json.Json
 
 class DatadogAPIReporterSpec extends AbstractHttpReporter with Matchers {
-
-
 
   "the DatadogAPIReporter" should {
     val reporter = new DatadogAPIReporter()

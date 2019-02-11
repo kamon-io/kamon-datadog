@@ -1,27 +1,26 @@
 package kamon
 
-import java.time.{Duration, Instant}
+import java.time.{ Duration, Instant }
 import java.util.concurrent.TimeUnit
 
 import com.typesafe.config.Config
 import kamon.metric.MeasurementUnit
-import kamon.metric.MeasurementUnit.{information, time}
+import kamon.metric.MeasurementUnit.{ information, time }
 import okhttp3._
 import play.api.libs.json.JsValue
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{ Failure, Success, Try }
 
 package object datadog {
 
   implicit class InstantImprovements(val instant: Instant) {
     def getEpochNano: Long = {
-      instant.getEpochSecond()*1000000000 +
-      instant.getNano()
+      instant.getEpochSecond() * 1000000000 +
+        instant.getNano()
     }
   }
 
-
-  private [datadog] case class HttpClient(apiUrl: String, apiKey: String, usingAgent: Boolean, connectTimeout: Duration, readTimeout: Duration, requestTimeout: Duration) {
+  private[datadog] case class HttpClient(apiUrl: String, apiKey: String, usingAgent: Boolean, connectTimeout: Duration, readTimeout: Duration, requestTimeout: Duration) {
 
     val httpClient: OkHttpClient = createHttpClient()
 
@@ -32,7 +31,7 @@ package object datadog {
         config.getBoolean("using-agent"),
         config.getDuration("connect-timeout"),
         config.getDuration("read-timeout"),
-        config.getDuration("request-timeout"),
+        config.getDuration("request-timeout")
       )
     }
 
@@ -42,8 +41,8 @@ package object datadog {
 
     def doPost(contentType: String, contentBody: String): Try[String] = {
       val body = RequestBody.create(MediaType.parse(contentType), contentBody)
-      val url = usingAgent match{
-        case true => apiUrl
+      val url = usingAgent match {
+        case true  => apiUrl
         case false => apiUrl + "?api_key=" + apiKey
       }
       val request = new Request.Builder().url(url).post(body).build
@@ -65,7 +64,6 @@ package object datadog {
       doPost("application/json; charset=utf-8", contentBody.toString())
     }
 
-
     // Apparently okhttp doesn't require explicit closing of the connection
     private def createHttpClient(): OkHttpClient = {
       new OkHttpClient.Builder()
@@ -77,20 +75,19 @@ package object datadog {
     }
   }
 
-
   def readTimeUnit(unit: String): MeasurementUnit = unit match {
-    case "s" => time.seconds
-    case "ms" => time.milliseconds
-    case "µs" => time.microseconds
-    case "ns" => time.nanoseconds
+    case "s"   => time.seconds
+    case "ms"  => time.milliseconds
+    case "µs"  => time.microseconds
+    case "ns"  => time.nanoseconds
     case other => sys.error(s"Invalid time unit setting [$other], the possible values are [s, ms, µs, ns]")
   }
 
   def readInformationUnit(unit: String): MeasurementUnit = unit match {
-    case "b" => information.bytes
-    case "kb" => information.kilobytes
-    case "mb" => information.megabytes
-    case "gb" => information.gigabytes
+    case "b"   => information.bytes
+    case "kb"  => information.kilobytes
+    case "mb"  => information.megabytes
+    case "gb"  => information.gigabytes
     case other => sys.error(s"Invalid time unit setting [$other], the possible values are [b, kb, mb, gb]")
   }
 }

@@ -1,7 +1,7 @@
 package kamon.datadog
 
-import okhttp3.mockwebserver.{MockResponse, MockWebServer}
-import org.scalatest.{BeforeAndAfterAll, WordSpec}
+import okhttp3.mockwebserver.{ MockResponse, MockWebServer }
+import org.scalatest.{ BeforeAndAfterAll, WordSpec }
 
 abstract class AbstractHttpReporter extends WordSpec with BeforeAndAfterAll {
 
@@ -12,7 +12,7 @@ abstract class AbstractHttpReporter extends WordSpec with BeforeAndAfterAll {
     super.beforeAll()
   }
 
-  protected def mockResponse(path: String, response: MockResponse): String  ={
+  protected def mockResponse(path: String, response: MockResponse): String = {
     server.enqueue(response)
     server.url(path).toString
   }

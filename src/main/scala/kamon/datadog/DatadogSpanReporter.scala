@@ -4,10 +4,10 @@ import java.time.Duration
 
 import com.typesafe.config.Config
 import kamon.trace.IdentityProvider.Identifier
-import kamon.{Kamon, SpanReporter}
-import kamon.trace.{IdentityProvider, Span}
+import kamon.{ Kamon, SpanReporter }
+import kamon.trace.{ IdentityProvider, Span }
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsNumber, JsObject, Json}
+import play.api.libs.json.{ JsNumber, JsObject, Json }
 
 trait KamonDataDogTranslator {
   def translate(span: Span.FinishedSpan): DdSpan
@@ -30,17 +30,20 @@ object KamonDataDogTranslatorDefault$ extends KamonDataDogTranslator {
     val start = from.getEpochNano
     val duration = Duration.between(from, span.to)
     val marks = span.marks.map { m => m.key -> m.instant.getEpochNano }.toMap
-    val tags = span.tags.map { m => m._1 -> {
-      m._2 match {
-        case v:Span.TagValue.Boolean => {
-          v.text match {
-            case "true" => true
-            case "false" => false
+    val tags = span.tags.map { m =>
+      m._1 -> {
+        m._2 match {
+          case v: Span.TagValue.Boolean => {
+            v.text match {
+              case "true"  => true
+              case "false" => false
+            }
           }
+          case v: Span.TagValue.String => v.string
+          case v: Span.TagValue.Number => v.number
         }
-        case v:Span.TagValue.String => v.string
-        case v:Span.TagValue.Number => v.number
-      }}}
+      }
+    }
     val meta = marks ++ tags
     val error: Boolean = false
     new DdSpan(traceId, spanId, parentId, name, resource, service, "custom", start, duration, meta, error)
@@ -57,7 +60,7 @@ class DatadogSpanReporter extends SpanReporter {
   override def reportSpans(spans: Seq[Span.FinishedSpan]): Unit = if (spans.nonEmpty) {
     val spanList: List[Seq[JsObject]] = spans
       .map(span => translator.translate(span).toJson())
-      .groupBy{_.\("trace_id").get.toString()}
+      .groupBy { _.\("trace_id").get.toString() }
       .values
       .toList
     httpClient.doJsonPost(Json.toJson(spanList))
@@ -75,8 +78,5 @@ class DatadogSpanReporter extends SpanReporter {
     logger.info("Reconfigured the Kamon DataDog reporter")
     httpClient = new HttpClient(config.getConfig(httpConfigPath))
   }
-
-
-
 
 }
