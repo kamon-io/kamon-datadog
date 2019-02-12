@@ -59,7 +59,8 @@ trait TestData extends SpanBuilding {
     "string" -> Span.TagValue.String.apply("value"),
     "true" -> Span.TagValue.True,
     "false" -> Span.TagValue.False,
-    "number" -> Span.TagValue.Number(randomNumber)
+    "number" -> Span.TagValue.Number(randomNumber),
+    "null" -> null
   ))
 
   val jsonWithTags = json ++ Json.obj(
@@ -67,7 +68,8 @@ trait TestData extends SpanBuilding {
       "string" -> "value",
       "true" -> true,
       "false" -> false,
-      "number" -> randomNumber
+      "number" -> randomNumber,
+      "null" -> JsNull
     )
   )
 

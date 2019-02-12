@@ -22,7 +22,8 @@ case class DdSpan(
     case v: Int     => JsNumber(v)
     case v: Long    => JsNumber(v)
     case v: Boolean => JsBoolean(v)
-    case v: Any     => Json.toJson(v.toString)
+    case v: Any     => JsString(v.toString)
+    case null       => JsNull
   })
 
   def toJson(): JsObject = {

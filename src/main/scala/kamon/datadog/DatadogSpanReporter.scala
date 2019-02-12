@@ -41,6 +41,7 @@ object KamonDataDogTranslatorDefault$ extends KamonDataDogTranslator {
           }
           case v: Span.TagValue.String => v.string
           case v: Span.TagValue.Number => v.number
+          case null                    => null
         }
       }
     }
