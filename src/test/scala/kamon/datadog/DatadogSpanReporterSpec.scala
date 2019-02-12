@@ -55,6 +55,18 @@ trait TestData extends SpanBuilding {
   val spanWithoutParentId = span.copy(context = contextSpan.copy(parentID = IdentityProvider.NoIdentifier))
   val jsonWithoutParentId = json - "parent_id"
 
+  val spanWithError = span.copy(tags = Map(
+    "error" -> Span.TagValue.True
+  ))
+
+  val jsonWithError = json ++ Json.obj(
+    "meta" -> Json.obj(
+      "error" -> true
+    ),
+    "error" -> true,
+  )
+
+
   val spanWithTags = span.copy(tags = Map(
     "string" -> Span.TagValue.String.apply("value"),
     "true" -> Span.TagValue.True,
@@ -72,6 +84,7 @@ trait TestData extends SpanBuilding {
       "null" -> JsNull
     )
   )
+
 
   val spanWithMarks = span.copy(marks = Seq(
     Span.Mark(from, "from")
@@ -107,6 +120,7 @@ trait TestData extends SpanBuilding {
     "span with meta" -> (Seq(spanWithTags), Json.arr(Json.arr(jsonWithTags))),
     "span with marks" -> (Seq(spanWithMarks), Json.arr(Json.arr(jsonWithMarks))),
     "span with meta and marks" -> (Seq(spanWithTagsAndMarks), Json.arr(Json.arr(jsonWithTagsAndMarks))),
+    "span with error" -> (Seq(spanWithError), Json.arr(Json.arr(jsonWithError))),
 
     "multiple spans with same trace" -> (Seq(span, spanWithTags), Json.arr(Json.arr(json, jsonWithTags))),
     "multiple spans with two traces" -> (Seq(span, spanWithTags, otherTraceSpan, span), Json.arr(Json.arr(json, jsonWithTags, json), Json.arr(otherTraceJson)))

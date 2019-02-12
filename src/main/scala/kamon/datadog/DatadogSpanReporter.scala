@@ -45,8 +45,11 @@ object KamonDataDogTranslatorDefault$ extends KamonDataDogTranslator {
         }
       }
     }
+    val error: Boolean = tags.get("error") match {
+      case Some(v: Boolean) => v
+      case _                => false
+    }
     val meta = marks ++ tags
-    val error: Boolean = false
     new DdSpan(traceId, spanId, parentId, name, resource, service, "custom", start, duration, meta, error)
 
   }
