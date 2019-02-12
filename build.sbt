@@ -34,7 +34,7 @@ lazy val root = (project in file("."))
 def playJsonVersion = Def.setting {
   scalaBinaryVersion.value match {
     case "2.10"          => "com.typesafe.play"      %% "play-json"          % "2.4.11"
-    case "2.12" | "2.11" => "com.typesafe.play"      %% "play-json"          % "2.7.0"
+    case "2.12" | "2.11" => "com.typesafe.play"      %% "play-json"          % "2.6.9"
   }
 }
 
