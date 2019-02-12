@@ -63,9 +63,8 @@ trait TestData extends SpanBuilding {
     "meta" -> Json.obj(
       "error" -> true
     ),
-    "error" -> true,
+    "error" -> true
   )
-
 
   val spanWithTags = span.copy(tags = Map(
     "string" -> Span.TagValue.String.apply("value"),
@@ -84,7 +83,6 @@ trait TestData extends SpanBuilding {
       "null" -> JsNull
     )
   )
-
 
   val spanWithMarks = span.copy(marks = Seq(
     Span.Mark(from, "from")

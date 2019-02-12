@@ -5,11 +5,12 @@ import java.time.Instant
 import com.typesafe.config.ConfigFactory
 import kamon.Kamon
 import kamon.metric.{ MeasurementUnit, MetricValue, MetricsSnapshot, PeriodSnapshot }
+import kamon.testkit.Reconfigure
 import okhttp3.mockwebserver.{ MockResponse, MockWebServer }
 import org.scalatest.{ Matchers, WordSpec }
 import play.api.libs.json.Json
 
-class DatadogAPIReporterSpec extends AbstractHttpReporter with Matchers {
+class DatadogAPIReporterSpec extends AbstractHttpReporter with Matchers with Reconfigure {
 
   "the DatadogAPIReporter" should {
     val reporter = new DatadogAPIReporter()
@@ -19,7 +20,9 @@ class DatadogAPIReporterSpec extends AbstractHttpReporter with Matchers {
 
     "sends counter metrics" in {
       val baseUrl = mockResponse("/test", new MockResponse().setStatus("HTTP/1.1 200 OK"))
-      reporter.reconfigure(ConfigFactory.parseString("kamon.datadog.http.api-url = \"" + baseUrl + "\"").withFallback(Kamon.config()))
+      applyConfig("kamon.datadog.http.api-url = \"" + baseUrl + "\"")
+
+      reporter.reconfigure(Kamon.config())
 
       reporter.reportPeriodSnapshot(
         PeriodSnapshot.apply(

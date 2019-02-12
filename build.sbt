@@ -46,6 +46,9 @@ def scalaCompact = Def.setting {
   }
 }
 
+/* Changing Kamon configuration in real-time seems to turn tests unstable */ 
+parallelExecution in Test := false
+
 def formatSettings(prefs: IFormattingPreferences) = prefs
   .setPreference(AlignParameters, true)
   .setPreference(AlignSingleLineCaseStatements, true)
