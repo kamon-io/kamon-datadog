@@ -17,13 +17,14 @@
 package kamon.datadog
 
 import java.lang.StringBuilder
+import java.nio.charset.StandardCharsets
 import java.text.{ DecimalFormat, DecimalFormatSymbols }
 import java.time.Duration
 import java.util.Locale
 
 import com.typesafe.config.Config
 import kamon.metric.MeasurementUnit.Dimension.{ Information, Time }
-import kamon.metric.{ MeasurementUnit, PeriodSnapshot, MetricDistribution, MetricValue }
+import kamon.metric.{ MeasurementUnit, MetricDistribution, MetricValue, PeriodSnapshot }
 import kamon.util.{ EnvironmentTagBuilder, Matcher }
 import kamon.{ Kamon, MetricReporter }
 import org.slf4j.LoggerFactory
@@ -64,7 +65,7 @@ class DatadogAPIReporter extends MetricReporter {
     }
   }
 
-  private[datadog] def buildRequestBody(snapshot: PeriodSnapshot): String = {
+  private[datadog] def buildRequestBody(snapshot: PeriodSnapshot): Array[Byte] = {
     val timestamp = snapshot.from.getEpochSecond.toString
 
     val host = Kamon.environment.host
@@ -104,7 +105,9 @@ class DatadogAPIReporter extends MetricReporter {
     seriesBuilder
       .insert(0, "{\"series\":[")
       .append("]}")
-      .toString
+      .toString()
+      .getBytes(StandardCharsets.UTF_8)
+
   }
 
   private def scale(value: Long, unit: MeasurementUnit): Double = unit.dimension match {

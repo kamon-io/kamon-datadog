@@ -17,15 +17,6 @@ case class DdSpan(
   meta:     Map[String, Any],
   error:    Boolean) {
 
-  implicit val anyValWriter = Writes[Any](a => a match {
-    case v: String  => JsString(v)
-    case v: Int     => JsNumber(v)
-    case v: Long    => JsNumber(v)
-    case v: Boolean => JsBoolean(v)
-    case v: Any     => JsString(v.toString)
-    case null       => JsNull
-  })
-
   def toJson(): JsObject = {
     val json = JsObject(Map(
       "trace_id" -> JsNumber(BigDecimal(traceId)),
@@ -36,8 +27,17 @@ case class DdSpan(
       "service" -> JsString(service),
       "start" -> JsNumber(BigDecimal(start)),
       "duration" -> JsNumber(BigDecimal(duration.toNanos)),
-      "meta" -> JsObject(meta.map(m => m._1 -> Json.toJson(m._2))),
-      "error" -> JsBoolean(error)
+      "meta" -> JsObject(
+        meta.map {
+          case (key, null) => key -> JsNull
+          case (key, v)    => key -> JsString(v.toString)
+        }
+      ),
+      "error" -> JsNumber(
+        error match {
+          case true => 1
+          case _    => 0
+        })
     ))
     if (parentId.nonEmpty) {
       json + ("parent_id", JsNumber(BigDecimal(parentId.get)))

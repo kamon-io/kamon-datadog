@@ -47,7 +47,7 @@ trait TestData extends SpanBuilding {
     "duration" -> JsNumber(duration.getSeconds * 1000000000 + duration.getNano),
     "name" -> "operation name",
     "meta" -> Json.obj(),
-    "error" -> false,
+    "error" -> 0,
     "type" -> "custom",
     "start" -> JsNumber(from.getEpochNano)
   )
@@ -61,9 +61,9 @@ trait TestData extends SpanBuilding {
 
   val jsonWithError = json ++ Json.obj(
     "meta" -> Json.obj(
-      "error" -> true
+      "error" -> "true"
     ),
-    "error" -> true
+    "error" -> 1
   )
 
   val spanWithTags = span.copy(tags = Map(
@@ -77,9 +77,9 @@ trait TestData extends SpanBuilding {
   val jsonWithTags = json ++ Json.obj(
     "meta" -> Json.obj(
       "string" -> "value",
-      "true" -> true,
-      "false" -> false,
-      "number" -> randomNumber,
+      "true" -> "true",
+      "false" -> "false",
+      "number" -> randomNumber.toString,
       "null" -> JsNull
     )
   )
@@ -90,7 +90,7 @@ trait TestData extends SpanBuilding {
 
   val jsonWithMarks = json ++ Json.obj(
     "meta" -> Json.obj(
-      "from" -> JsNumber(from.getEpochNano)
+      "from" -> JsString(from.getEpochNano.toString)
     )
   )
 

@@ -1,5 +1,6 @@
 package kamon
 
+import java.nio.charset.StandardCharsets
 import java.time.{ Duration, Instant }
 import java.util.concurrent.TimeUnit
 
@@ -39,7 +40,7 @@ package object datadog {
       Try(httpClient.newCall(request).execute())
     }
 
-    def doPost(contentType: String, contentBody: String): Try[String] = {
+    def doPost(contentType: String, contentBody: Array[Byte]): Try[String] = {
       val body = RequestBody.create(MediaType.parse(contentType), contentBody)
       val url = usingAgent match {
         case true  => apiUrl
@@ -61,7 +62,8 @@ package object datadog {
     }
 
     def doJsonPost(contentBody: JsValue): Try[String] = {
-      doPost("application/json; charset=utf-8", contentBody.toString())
+      // Datadog Agent does not accept ";charset=UTF-8", using bytes to send Json posts
+      doPost("application/json", contentBody.toString().getBytes(StandardCharsets.UTF_8))
     }
 
     // Apparently okhttp doesn't require explicit closing of the connection
