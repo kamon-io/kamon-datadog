@@ -107,9 +107,9 @@ trait TestData extends SpanBuilding {
 
   val otherTraceSpan = span.copy(context = otherContextSpan)
   var otherTraceJson = json ++ (Json.obj(
-    "trace_id" -> JsNumber(BigDecimal(BigInt(otherContextSpan.traceID.string, 16))),
-    "span_id" -> JsNumber(BigDecimal(BigInt(otherContextSpan.spanID.string, 16))),
-    "parent_id" -> JsNumber(BigDecimal(BigInt(otherContextSpan.parentID.string, 16)))
+    "trace_id" -> BigDecimal(BigInt(otherContextSpan.traceID.string, 16)),
+    "span_id" -> BigDecimal(BigInt(otherContextSpan.spanID.string, 16)),
+    "parent_id" -> BigDecimal(BigInt(otherContextSpan.parentID.string, 16))
   ))
 
   val testMap: ListMap[String, (Seq[Span.FinishedSpan], JsArray)] = ListMap(
@@ -132,27 +132,28 @@ class DatadogSpanReporterSpec extends AbstractHttpReporter with Matchers with Re
 
     reporter.start()
 
-    testMap.foreach {
-      case (name, (spans, json)) => {
-        s"send ${name} to API" in {
+    val (firstSpan, _) = testMap.get("single span").head
 
-          val baseUrl = mockResponse("/test", new MockResponse().setStatus("HTTP/1.1 200 OK").setBody("OK"))
+    for ((name, (spans, json)) <- testMap) {
 
-          applyConfig("kamon.datadog.trace.http.api-url = \"" + baseUrl + "\"")
-          reporter.reconfigure(Kamon.config())
-          reporter.reportSpans(spans)
-          val request = server.takeRequest()
-          val url = request.getRequestUrl().toString()
-          val requestJson = Json.parse(request.getBody().readUtf8()).as[JsArray]
+      s"send ${name} to API" in {
 
-          // Ordering stuff
-          val sortedRequestJson = requestJson.value.sortWith(sortJsonSpans)
-          val sortedTestData = json.value.sortWith(sortJsonSpans)
+        val baseUrl = mockResponse("/test", new MockResponse().setStatus("HTTP/1.1 200 OK").setBody("OK"))
 
-          url shouldEqual baseUrl
-          sortedRequestJson shouldEqual sortedTestData
+        applyConfig("kamon.datadog.trace.http.api-url = \"" + baseUrl + "\"")
+        reporter.reconfigure(Kamon.config())
+        reporter.reportSpans(spans)
+        val request = server.takeRequest()
+        val url = request.getRequestUrl().toString()
+        val requestJson = Json.parse(request.getBody().readUtf8()).as[JsArray]
 
-        }
+        // Ordering stuff
+        val sortedRequestJson = requestJson.value.sortWith(sortJsonSpans)
+        val sortedTestData = json.value.sortWith(sortJsonSpans)
+
+        url shouldEqual baseUrl
+        sortedRequestJson shouldEqual sortedTestData
+
       }
     }
 
@@ -160,7 +161,7 @@ class DatadogSpanReporterSpec extends AbstractHttpReporter with Matchers with Re
       val baseUrl = mockResponse("/test", new MockResponse().setStatus("HTTP/1.1 500 Internal Server Error"))
       applyConfig("kamon.datadog.trace.http.api-url = \"" + baseUrl + "\"")
       reporter.reconfigure(Kamon.config())
-      reporter.reportSpans(testMap.get("single span").get._1)
+      reporter.reportSpans(firstSpan)
       server.takeRequest()
     }
 
@@ -169,7 +170,7 @@ class DatadogSpanReporterSpec extends AbstractHttpReporter with Matchers with Re
       val baseUrl = mockResponse("/test", new MockResponse().setStatus("HTTP/1.1 200 OK").setBody("OK").throttleBody(1, 6, TimeUnit.SECONDS))
       applyConfig("kamon.datadog.trace.http.api-url = \"" + baseUrl + "\"")
       reporter.reconfigure(Kamon.config())
-      reporter.reportSpans(testMap.get("single span").get._1)
+      reporter.reportSpans(firstSpan)
 
     }
 
