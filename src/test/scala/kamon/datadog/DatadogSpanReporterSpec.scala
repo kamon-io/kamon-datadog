@@ -8,7 +8,7 @@ import kamon.testkit.{ Reconfigure, SpanBuilding }
 import kamon.trace._
 import okhttp3.mockwebserver.MockResponse
 import org.scalatest.Matchers
-import play.api.libs.json.{ JsObject, _ }
+import play.api.libs.json._
 
 import scala.collection.immutable.ListMap
 import scala.util.Random

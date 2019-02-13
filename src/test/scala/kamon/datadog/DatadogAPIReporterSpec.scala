@@ -2,12 +2,11 @@ package kamon.datadog
 
 import java.time.Instant
 
-import com.typesafe.config.ConfigFactory
 import kamon.Kamon
 import kamon.metric.{ MeasurementUnit, MetricValue, MetricsSnapshot, PeriodSnapshot }
 import kamon.testkit.Reconfigure
-import okhttp3.mockwebserver.{ MockResponse, MockWebServer }
-import org.scalatest.{ Matchers, WordSpec }
+import okhttp3.mockwebserver.MockResponse
+import org.scalatest.Matchers
 import play.api.libs.json.Json
 
 class DatadogAPIReporterSpec extends AbstractHttpReporter with Matchers with Reconfigure {

@@ -4,10 +4,10 @@ import java.time.Duration
 
 import com.typesafe.config.Config
 import kamon.trace.IdentityProvider.Identifier
-import kamon.{ Kamon, SpanReporter }
 import kamon.trace.{ IdentityProvider, Span }
+import kamon.{ Kamon, SpanReporter }
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{ JsNumber, JsObject, Json }
+import play.api.libs.json.{ JsObject, Json }
 
 trait KamonDataDogTranslator {
   def translate(span: Span.FinishedSpan): DdSpan

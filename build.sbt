@@ -13,8 +13,8 @@
  * =========================================================================================
  */
 
-import scalariform.formatter.preferences._
 import com.typesafe.sbt.SbtScalariform.ScalariformKeys
+import scalariform.formatter.preferences._
 
 
 val kamonCore             = "io.kamon"               %% "kamon-core"          % "1.1.2"

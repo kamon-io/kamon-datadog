@@ -22,14 +22,13 @@ import java.time.Duration
 import java.util.Locale
 
 import com.typesafe.config.Config
-import kamon.metric._
-import kamon.metric.MeasurementUnit
 import kamon.metric.MeasurementUnit.Dimension.{ Information, Time }
+import kamon.metric.{ MeasurementUnit, PeriodSnapshot, MetricDistribution, MetricValue }
 import kamon.util.{ EnvironmentTagBuilder, Matcher }
 import kamon.{ Kamon, MetricReporter }
 import org.slf4j.LoggerFactory
 
-import scala.util.{ Failure, Success, Try }
+import scala.util.{ Failure, Success }
 
 class DatadogAPIReporter extends MetricReporter {
   import DatadogAPIReporter._
