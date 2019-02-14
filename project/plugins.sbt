@@ -2,3 +2,4 @@ lazy val root: Project = project.in(file(".")).dependsOn(RootProject(latestSbtUm
 lazy val latestSbtUmbrella = uri("git://github.com/kamon-io/kamon-sbt-umbrella.git")
 
 addSbtPlugin("org.scalariform" % "sbt-scalariform" % "1.8.2")
+addSbtPlugin("org.foundweekends" % "sbt-bintray" % "0.5.4")

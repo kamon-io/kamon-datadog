@@ -10,6 +10,13 @@ scala:
   - 2.11.11
   - 2.12.8
 
+jobs:
+  include:
+    - stage: deploy
+      script: "sbt +publish"
+      if: repo = Cobliteam/kamon-datadog AND type = push AND (branch = master OR tag =~ ^v)
+
+
 # These directories are cached to S3 at the end of the build
 cache:
   directories:

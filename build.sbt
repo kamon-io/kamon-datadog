@@ -16,6 +16,14 @@
 import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 import scalariform.formatter.preferences._
 
+name := "kamon-datadog"
+organization := "co.cobli"
+licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html"))
+publishMavenStyle := true
+bintrayOrganization := Some("cobli")
+bintrayRepository := "maven"
+
+
 
 val kamonCore             = "io.kamon"               %% "kamon-core"          % "1.1.2"
 val kamonTestKit          = "io.kamon"               %% "kamon-testkit"       % "1.1.2"
