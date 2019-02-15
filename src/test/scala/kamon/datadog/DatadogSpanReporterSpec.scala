@@ -45,7 +45,7 @@ trait TestData extends SpanBuilding {
     "service" -> "kamon-application",
     "resource" -> "operation name",
     "duration" -> JsNumber(duration.getSeconds * 1000000000 + duration.getNano),
-    "name" -> "operation name",
+    "name" -> "kamon.trace",
     "meta" -> Json.obj(),
     "error" -> 0,
     "type" -> "custom",
@@ -67,20 +67,24 @@ trait TestData extends SpanBuilding {
   )
 
   val spanWithTags = span.copy(tags = Map(
-    "string" -> Span.TagValue.String.apply("value"),
+    "string" -> Span.TagValue.String("value"),
     "true" -> Span.TagValue.True,
     "false" -> Span.TagValue.False,
     "number" -> Span.TagValue.Number(randomNumber),
-    "null" -> null
+    "null" -> null,
+    //Default for span name
+    "component" -> Span.TagValue.String("custom.component")
   ))
 
   val jsonWithTags = json ++ Json.obj(
+    "name" -> "custom.component",
     "meta" -> Json.obj(
       "string" -> "value",
       "true" -> "true",
       "false" -> "false",
       "number" -> randomNumber.toString,
-      "null" -> JsNull
+      "null" -> JsNull,
+      "component" -> "custom.component"
     )
   )
 
@@ -94,12 +98,11 @@ trait TestData extends SpanBuilding {
     )
   )
 
-  val spanWithTagsAndMarks = span.copy(
-    marks = Seq(Span.Mark(from, "from")),
-    tags = spanWithTags.tags
+  val spanWithTagsAndMarks = spanWithTags.copy(
+    marks = Seq(Span.Mark(from, "from"))
   )
 
-  val jsonWithTagsAndMarks = json ++ Json.obj(
+  val jsonWithTagsAndMarks = jsonWithTags ++ Json.obj(
     "meta" -> (jsonWithTags.\("meta").as[JsObject] ++ jsonWithMarks.\("meta").as[JsObject])
   )
 

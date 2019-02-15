@@ -23,7 +23,10 @@ object KamonDataDogTranslatorDefault$ extends KamonDataDogTranslator {
       case Identifier(value, _)          => Some(BigInt(value, 16))
     }
 
-    val name = span.operationName
+    val name = span.tags.get("component")
+      .getOrElse(Span.TagValue.String("kamon.trace"))
+      .asInstanceOf[Span.TagValue.String]
+      .string
     val resource = span.operationName
     val service = Kamon.environment.service
     val from = span.from
