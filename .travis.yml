@@ -6,12 +6,12 @@ language: scala
 jdk: oraclejdk8
 
 scala:
-  - 2.10.6
-  - 2.11.11
   - 2.12.8
+
 
 jobs:
   include:
+    - script: "sbt ++$TRAVIS_SCALA_VERSION +test"
     - stage: deploy
       script: "sbt +publish"
       if: repo = Cobliteam/kamon-datadog AND type = push AND (branch = master OR tag =~ ^v)
