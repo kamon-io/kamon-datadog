@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory
 
 class DatadogAgentReporterFactory extends ModuleFactory {
   override def create(settings: ModuleFactory.Settings): DatadogAgentReporter = {
-    new DatadogAgentReporter(DatadogAgentReporter.readConfiguration(Kamon.config()))
+    DatadogAgentReporter.create()
   }
 }
 // 1 arg constructor is intended for injecting config via unit tests
@@ -109,6 +109,10 @@ class DatadogAgentReporter private[datadog] (@volatile private var config: Datad
 object DatadogAgentReporter {
 
   private val logger = LoggerFactory.getLogger(classOf[DatadogAgentReporter])
+
+  def create(): DatadogAgentReporter = {
+    new DatadogAgentReporter(DatadogAgentReporter.readConfiguration(Kamon.config()))
+  }
 
   trait MeasurementFormatter {
     def formatMeasurement(measurementData: String, tags: TagSet): String
